@@ -11,10 +11,8 @@
 ![png image](https://raw.githubusercontent.com/mikbill/users-bot-telegram/main/resources/img/image.png)
 
 ### 0. Требования
-Данный бот использует LK API для работы с абонентом и OTP из модуля "регистрации по смс" для валидации абонента.
-
+Данный бот использует LK API для работы с абонентом
  - [Установка LK API](https://wiki.mikbill.pro/billing/external/api_cabinet)
- - [СМС: Тип регистрации #1](https://wiki.mikbill.pro/billing/preferences/apps/sms_registration/type_1)
 
 Без этого минимума бот работать не будет!
 

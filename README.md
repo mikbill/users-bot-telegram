@@ -3,7 +3,7 @@
 ## MB User Bot
 Бот предназнчен для абонентов биллинга MikBill. Миссия: организовать работу кабинета в меседжере на сколько это возможно
 
-![png image](https://github.com/mikbill/users-bot-telegram/blob/master/resources/img/image.png?raw=true)
+![png image](https://raw.githubusercontent.com/mikbill/users-bot-telegram/main/resources/img/image.png)
 
 ### 1. Установка
 

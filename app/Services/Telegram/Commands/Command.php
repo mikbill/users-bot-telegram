@@ -46,7 +46,6 @@ abstract class Command extends CommandHandler
             $this->setUserID($this->update->callback_query->from->id);
         }
 
-
         $tgUser = TelegramUsers::find($this->getUserID());
         if ($tgUser) {
             // Обновим пользователя

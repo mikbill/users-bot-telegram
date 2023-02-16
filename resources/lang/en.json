@@ -32,5 +32,7 @@
 	"settings": "⚙️Settings",
 	"tariff": "Tariff",
 	"unknown_error_text": "Something went wrong...",
-	"user_info": "👤 My info"
+	"user_info": "👤 My info",
+    "enter_password": "Enter your account password",
+    "success_loginpassword_enter": "Authorization passed successfully"
 }

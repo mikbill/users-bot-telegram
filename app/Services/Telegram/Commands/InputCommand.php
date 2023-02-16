@@ -8,7 +8,12 @@ use App\Models\TelegramUsers;
 use App\Notifications\BotNotification;
 use WeStacks\TeleBot\Objects\Update;
 use WeStacks\TeleBot\TeleBot;
+use Illuminate\Support\Facades\Log;
 
+/**
+ * Class InputCommand
+ * @package App\Services\Telegram\Commands
+ */
 class InputCommand extends Command
 {
     public static function trigger(Update $update, TeleBot $bot)
@@ -117,12 +122,13 @@ class InputCommand extends Command
 
         // Если не авторизованы
         if (!$this->isAuth()) {
-
-
             switch ($lastAction) {
-
                 case "otp_sended":
                     $this->applyOtp($text);
+                    break;
+
+                case "enter_password":
+                    $this->applyUserPassword($text);
                     break;
 
                 default:
@@ -130,9 +136,7 @@ class InputCommand extends Command
                     $this->noAuthMenu();
             }
         } else {
-
             switch ($lastAction) {
-
                 case "langMenu":
 
                     break;
@@ -142,6 +146,47 @@ class InputCommand extends Command
                     $this->mainMenu();
             }
         }
+    }
+
+    /**
+     * Применить введенный пароль
+     */
+    private function applyUserPassword($text)
+    {
+        $this->setLastAction(__FUNCTION__);
+
+        $keyboard = [
+            [["text" => trans("back")]],
+        ];
+
+        $item = TelegramUsers::whereId($this->getUserID())->get("phone");
+        $response = $this->ClientAPI->preAuth($item[0]["phone"]);
+        if (isset($response['code']) and $response['code'] == 0) {
+            $response = $this->ClientAPI->authLoginPassword($response['data']['login'], $text);
+            if (isset($response['data']['token'])) {
+                // Привяжем номер user_id телеграма к uid запишем токен
+                TelegramUsers::updateOrCreate(['id' => $this->getUserID()], ['token'  => $response['data']['token']]);
+
+                $text = trans("success_loginpassword_enter");
+                $keyboard = [
+                    [["text" => trans("main_menu")]],
+                ];
+            } else {
+                $text = trans("unknown_error_text");
+            }
+        } else {
+            $text = trans("unknown_error_text");
+        }
+
+        $this->sendMessage([
+            'text'         => $text,
+            'parse_mode'   => 'HTML',
+            'reply_markup' => [
+                'keyboard'          => $keyboard,
+                'resize_keyboard'   => true,
+                'one_time_keyboard' => true
+            ]
+        ]);
     }
 
     /**
@@ -196,54 +241,45 @@ class InputCommand extends Command
         $phone_number = $this->update->message->contact->phone_number;
 
         // Запишем присланный телефон
-        TelegramUsers::where('id', $this->getUserID())
-            ->update(['phone' => $phone_number]);
+        TelegramUsers::where('id', $this->getUserID())->update(['phone' => $phone_number]);
 
         $keyboard = [
             [["text" => trans("back")]],
         ];
 
-        // Пришел номер пытаемся авторизоваться по ОТП
-        $response = $this->ClientAPI->authPhone($phone_number);
+        $auth_method = config("services.mb_api.auth_method");
+        if( $auth_method == "login" ) {
+            $response = $this->ClientAPI->preAuth($phone_number);
+            if (isset($response['code']) and $response['code'] == 0) {
+                TelegramUsers::where('id', $this->getUserID())->update(['mb_uid' => $response['data']['uid']]);
 
-        if (isset($response['code']) and $response['code'] == 0) {
-            $text = trans("otp_sended");
-            $this->setLastAction("otp_sended");
-        } else {
-            if (isset($response['code']) and $response['code'] == -12) {
-                // АПИ не ответило
-                $text = trans("auth_not_found_user", ["support_phone" => "0 800 00-00-00"]);
+                $text = trans("enter_password");
+                $this->setLastAction("enter_password");
             } else {
-                // АПИ не ответило
-                $text = trans("unknown_error_text");
+                if (isset($response['code']) and $response['code'] == -12) {
+                    // АПИ не ответило
+                    $text = trans("auth_not_found_user", ["support_phone" => "0 800 00-00-00"]);
+                } else {
+                    // АПИ не ответило
+                    $text = trans("unknown_error_text");
+                }
+            }
+        } else {
+            // Пришел номер пытаемся авторизоваться по ОТП
+            $response = $this->ClientAPI->authPhone($phone_number);
+            if (isset($response['code']) and $response['code'] == 0) {
+                $text = trans("otp_sended");
+                $this->setLastAction("otp_sended");
+            } else {
+                if (isset($response['code']) and $response['code'] == -12) {
+                    // АПИ не ответило
+                    $text = trans("auth_not_found_user", ["support_phone" => "0 800 00-00-00"]);
+                } else {
+                    // АПИ не ответило
+                    $text = trans("unknown_error_text");
+                }
             }
         }
-
-
-//        // Ищем абонента по номеру
-//        $response = $api->searchUser($phone_number, 'mobile_phone'); // from $phone_number
-//
-//        // Привязка существует, получаем токен для работы через ЛК API
-//        if (isset($response['data'][0]['uid'])) {
-//            // Абонента нашли, отправляем OTP
-//
-//            // Привяжем номер user_id телеграма к uid
-//            $response = $api->bindUser($this->getUserID(), $response['data'][0]['uid']);
-//            if (isset($response['success']) and $response['success'] === true) {
-//                $text = "Спасибо. Бот успешно авторизован! 🎉";
-//
-//                $keyboard = [
-//                    [["text" => TextManager::get("MAIN_MENU")]],
-//                ];
-//            }
-//
-//            // Поулчили OTP привязываем учетку к номеру
-//            // $text2 = "Введите пароль из SMS, отправленный на указанный номер телефона. ";
-//
-//        } else {
-//            // Абонента не нашли, пишем что не наш абонент
-//            $text = "К сожалению мы не смогли найти Вас среди наших абонентов. Обратитесь в службу поддержки. ";
-//        }
 
         $this->sendMessage([
             'text'         => $text,
@@ -254,7 +290,6 @@ class InputCommand extends Command
                 'one_time_keyboard' => true
             ]
         ]);
-
     }
 
     private function userInfoMenu()
@@ -370,10 +405,7 @@ class InputCommand extends Command
         App::setLocale($locale);
 
         // Обновим пользователя
-        TelegramUsers::whereId($this->getUserID())
-            ->update([
-                'language' => $locale,
-            ]);
+        TelegramUsers::whereId($this->getUserID())->update(['language' => $locale]);
 
         $text = trans("lang_changed") . " " . trans($command);
 
@@ -403,9 +435,9 @@ class InputCommand extends Command
         $text .= "🇺🇸 <b>Выбор языка</b> - выберите язык, на котором бот будет вести диалог; \n";
 
         $keyboard = [
-//            [["text" => trans("notifications")], ["text" => trans("lang")]],
-[["text" => trans("lang")]],
-[["text" => trans("back")]],
+            //[["text" => trans("notifications")], ["text" => trans("lang")]],
+            [["text" => trans("lang")]],
+            [["text" => trans("back")]],
         ];
 
         $this->sendMessage([

@@ -33,6 +33,7 @@ return [
     'mb_api' => [
         'host'         => env('MB_API_HOST'),
         'secret_key'   => env('MB_API_SECRET_KEY'),
-        'cabinet_host' => env('MB_CABINET_HOST')
+        'cabinet_host' => env('MB_CABINET_HOST'),
+        'auth_method'  => env('MB_API_AUTH_METHOD', 'login')
     ]
 ];

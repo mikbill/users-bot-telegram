@@ -3,37 +3,27 @@
 ## MB User Bot
 Бот предназнчен для абонентов биллинга MikBill. Миссия: организовать работу кабинета в меседжере на сколько это возможно
 
-
-### Возможности:
- - 
- - 
- - 
- - 
- - 
- - 
- 
-![png image](https://github.com/kagatan/mb-support-bot/blob/master/resources/img/image.png?raw=true)
+![png image](https://github.com/mikbill/users-bot-telegram/blob/master/resources/img/image.png?raw=true)
 
 ### 1. Установка
 
 Устанвливаем пакеты и зависимости
 ```shell script
 cd /var/www/
-git clone https://github.com/kagatan/mb-users-bot.git
-cd mb-support-bot
+git clone https://github.com/mikbill/users-bot-telegram.git
+cd users-bot-telegram
 
 composer install
 
 # даем права
 sudo chown -R www-data:www-data /var/www/mb-users-bot
 sudo chmod -R 775 /var/www/mb-users-bot/storage/
-
 ```
 
 ### 2. Nginx 
 
 создаем конфиг на публичную диреторию
-/var/www/mb-users-bot/public
+/var/www/users-bot-telegram/public
 
 в идеале вынести на отдельный поддомен, и указать его в конфиге APP_URL
 для вебхука телеграма обязателен валидный сертификат
@@ -48,7 +38,7 @@ p.s. необходима если будет использовать вебх�
    }
 
    location / {
-        root   /var/www/mb-users-bot/public;
+        root   /var/www/users-bot-telegram/public;
         index  index.php;
         try_files $uri $uri/ /index.php?$args;
    }
@@ -57,7 +47,7 @@ p.s. необходима если будет использовать вебх�
       include /etc/nginx/fastcgi_params;
       fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
       fastcgi_index index.php;
-      fastcgi_param SCRIPT_FILENAME /var/www/mb-users-bot/public$fastcgi_script_name;
+      fastcgi_param SCRIPT_FILENAME /var/www/users-bot-telegram/public$fastcgi_script_name;
    }
 
 ...
@@ -67,7 +57,7 @@ p.s. необходима если будет использовать вебх�
 ### 2.1 Apache
 
 создаем конфиг на публичную директорию
-/var/www/mb-users-bot/public
+/var/www/users-bot-telegram/public
 
 
 пример .htaccess
@@ -97,7 +87,8 @@ DirectoryIndex /public/index.php
 
 ### 3. Настраиваем .env
 
-Конфиг находится в корне директории ,файл .env
+Конфиг находится в корне директории, файл .env.example
+Скопируйте его переименовав в .env
 
 Необходимые к заполнению:
 
@@ -112,9 +103,9 @@ DB_PASSWORD=
 TELEGRAM_BOT_TOKEN="your:telegram-token"
 TELEGRAM_BOT_NAME="YourBotName"
 
-MB_API_HOST="http://api.loc"
-MB_API_SECRET_KEY=your_key
-MB_CABINET_HOST="http://stat2.loc"
+MB_API_HOST="http://lkapi.ispnet.demo"
+MB_API_SECRET_KEY="apikey"
+MB_CABINET_HOST="http://stat.ispnet.demo"
 
 ```
 
@@ -123,6 +114,18 @@ MB_CABINET_HOST="http://stat2.loc"
 ```shell script
 
 php artisan migrate
+
+```
+
+### 3.2 JWT и ключи
+
+
+```shell script
+
+php artisan key:generate
+
+php artisan jwt:secret
+
 ```
 
 ### 4. Webhook
@@ -143,6 +146,11 @@ php artisan telebot:webhook --remove
 
 Чтоб запустить необходимо сначала выполнить команду 
 "удалить вебхук" если он установлен
+```php
+php artisan telebot:webhook --remove
+```
+
+После чего можно запустить пулинг
 ```php
 php artisan telebot:polling --all
 ```

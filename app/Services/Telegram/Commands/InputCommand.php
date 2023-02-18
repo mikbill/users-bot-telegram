@@ -161,7 +161,7 @@ class InputCommand extends Command
         $item = TelegramUsers::whereId($this->getUserID())->get("phone");
         $response = $this->ClientAPI->preAuth($item[0]["phone"]);
         if (isset($response['code']) and $response['code'] == 0) {
-            $response = $this->ClientAPI->authLoginPassword($response['data']['login'], $text);
+            $response = $this->ClientAPI->auth($response['data']['login'], $text);
             if (isset($response['data']['token'])) {
                 // Привяжем номер user_id телеграма к uid запишем токен
                 TelegramUsers::updateOrCreate(['id' => $this->getUserID()], ['token'  => $response['data']['token']]);

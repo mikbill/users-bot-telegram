@@ -1,2 +1,5 @@
+.env
+.idea/
+vendor/
 !data/
 !.gitignore

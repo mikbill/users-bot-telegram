@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\Log;
  */
 class InputCommand extends Command
 {
+    /**
+     * This function should return `true` if this handler should handle given update, or `false` if should not.
+     *
+     * @return bool
+     */
     public static function trigger(Update $update, TeleBot $bot)
     {
         return isset($update->message->text) || isset($update->message->contact);
@@ -32,19 +37,16 @@ class InputCommand extends Command
         $text = isset($update->message->text) ? $update->message->text : '';
         $command = Helper::checkCommand($text);
 
-
-        dump($text);
-        dump($command);
+        dump("text:" . $text);
+        dump("command:" . $command);
         // Если не авторизованы
         if (!$this->isAuth()) {
-
             // Если поделились контактом
             if (isset($update->message->contact)) {
                 $command = "send_contact"; // переопределяем меню
             }
 
             switch ($command) {
-
                 case "no_auth":
                     $this->noAuthMenu();
                     break;
@@ -57,9 +59,7 @@ class InputCommand extends Command
                     $this->parseInputText($text);
             }
         } else {
-
             switch ($command) {
-
                 case "main_menu":
                     $this->mainMenu();
                     break;
@@ -110,7 +110,6 @@ class InputCommand extends Command
                     $this->parseInputText($text);
             }
         }
-
     }
 
     /**
@@ -505,8 +504,7 @@ class InputCommand extends Command
         $this->setLastAction(__FUNCTION__);
 
         $tgUsers = $this->getUser();
-
-        $text = "🤯 Мы сейчас сильно заняты. Если что то срочное позвоните в техподдержку...";
+        $text = trans("Hello");
 
         $keyboard = [
             [["text" => trans("back")]],
@@ -526,9 +524,8 @@ class InputCommand extends Command
     private function newsMenu()
     {
         $this->setLastAction(__FUNCTION__);
-
-        $text = "🤐 Тсс... Здесь будут новости, но чуть позже...";
-
+        $text = trans("Hello");
+        
         $keyboard = [
             [["text" => trans("back")]],
         ];
@@ -574,13 +571,6 @@ class InputCommand extends Command
         $this->setLastAction(__FUNCTION__);
 
         $text = trans("main_menu_text");
-
-//        $keyboard = [
-//            [["text" => trans("user_info")], ["text" => trans("services")]],
-//            [["text" => trans("news")], ["text" => trans("contacts")]],
-//            [["text" => trans("help")], ["text" => trans("settings")]]
-//        ];
-//
 
         $keyboard = [
             [["text" => trans("user_info")], ["text" => trans("news")]],

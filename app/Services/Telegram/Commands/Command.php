@@ -1,18 +1,20 @@
 <?php
 
-
 namespace App\Services\Telegram\Commands;
-
 
 use App;
 use App\Models\TelegramUsers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Kagatan\MikBillClientAPI\ClientAPI;
+use App\Services\Telegram\ClientAPI;
 use WeStacks\TeleBot\Handlers\CommandHandler;
 use WeStacks\TeleBot\Objects\Update;
 use WeStacks\TeleBot\TeleBot;
 
+/**
+ * Class Command
+ * @package App\Services\Telegram\Commands
+ */
 abstract class Command extends CommandHandler
 {
     private $user_id = -1;
@@ -35,9 +37,6 @@ abstract class Command extends CommandHandler
         } else {
             $language_code = $this->update->message->from->language_code;
         }
-
-        // Логируем все что пришло на вход update
-//        Log::emergency($this->update);
 
         // Инициализируем ID пользователя
         if (isset($this->update->message->from->id)) {
@@ -83,42 +82,82 @@ abstract class Command extends CommandHandler
         $this->checkAuth();
     }
 
+    /**
+     * @param $user_id
+     */
     private function setUserID($user_id)
     {
         $this->user_id = $user_id;
     }
 
+    /**
+     * @param TelegramUsers $user
+     */
     public function setUser(TelegramUsers $user)
     {
         $this->user = $user;
     }
 
-
+    /**
+     * @return TelegramUsers
+     */
     public function getUser()
     {
         return $this->user;
     }
 
+    /**
+     * @return int
+     */
     public function getUserID()
     {
         return $this->user_id;
     }
 
+    /**
+     * @param $action
+     */
     public function setLastAction($action)
     {
         Cache::put($this->user_id . '_last_action', $action);
     }
 
+    /**
+     * @return mixed
+     */
     public function getLastAction()
     {
         return Cache::get($this->user_id . '_last_action');
     }
 
+    /**
+     * Сохранить в кеше
+     * @param string $value
+     * @param mixed $value
+     */
+    public function setValue($key, $value) {
+        Cache::put($this->user_id . '_memory_' . $key, $value);
+    }
+
+    /**
+     * Достать из кеша
+     * @param mixed $value
+     */
+    public function getValue($key) {
+        Cache::get($this->user_id . '_memory_' . $key);
+    }
+    
+    /**
+     * @return bool
+     */
     public function isAuth()
     {
         return $this->isAuth;
     }
 
+    /**
+     * @return bool
+     */
     public function checkAuth()
     {
         return $this->isAuth = TelegramUsers::where('id', '=', $this->getUserID())->whereNotNull('token')->exists();

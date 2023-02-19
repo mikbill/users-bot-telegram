@@ -583,7 +583,7 @@ class ClientAPI
             'headers'     => $headers
         ]);
 
-        Log::debug("url:" . $uri);
+        Log::debug("url: {$method} {$uri}");
         Log::debug("form_params:" . json_encode($params));
         Log::debug("headers:" . json_encode($headers));
 

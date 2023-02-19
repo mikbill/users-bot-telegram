@@ -131,9 +131,7 @@ class PaymentsCommand extends Command
                         }
                     }
 
-                    if( count($tmp) == 1 ) {
-                        $keyboard[] = [$tmp];
-                    } elseif ( count($tmp) == 2 ) {
+                    if( !empty($tmp) ) {
                         $keyboard[] = $tmp;
                     }
                     

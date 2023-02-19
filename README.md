@@ -6,6 +6,10 @@
 Возможности:
  - Валидация абонента по ОТП
  - Базовая информация о абоненте
+ - Генерация платежных ссылок
+ - Опалата картой пополнения
+ - Изменение тарифа
+ - История платежей
 
 
 ![png image](https://raw.githubusercontent.com/mikbill/users-bot-telegram/main/resources/img/image.png)

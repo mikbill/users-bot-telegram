@@ -51,9 +51,5 @@ return [
                 \App\Services\Telegram\Commands\CallBackCommand::class,
             ],
         ],
-
-        // 'second_bot' => [
-        //     'token'         => env('TELEGRAM_BOT2_TOKEN', '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11'),
-        // ],
     ],
 ];

@@ -6,9 +6,14 @@ use App;
 use App\Helpers\Helper;
 use App\Models\TelegramUsers;
 use App\Notifications\BotNotification;
+use App\Services\Telegram\Commands\HistoryPaymentsCommand;
+use App\Services\Telegram\Commands\HistorySessionsCommand;
+use App\Services\Telegram\Commands\NewsCommand;
+use App\Services\Telegram\Commands\PaymentsCommand;
+use App\Services\Telegram\Commands\UserCommand;
 use WeStacks\TeleBot\Objects\Update;
 use WeStacks\TeleBot\TeleBot;
-use Illuminate\Support\Facades\Log;
+use App\Services\Telegram\Commands\VoucherCommand;
 
 /**
  * Class InputCommand
@@ -36,9 +41,13 @@ class InputCommand extends Command
 
         $text = isset($update->message->text) ? $update->message->text : '';
         $command = Helper::checkCommand($text);
-
-        dump("text:" . $text);
-        dump("command:" . $command);
+        if(empty($command)) {
+            $command = $text;
+        }
+        
+        dump(__CLASS__ . "->text:" . $text);
+        dump(__CLASS__ . "->command:" . $command);
+        
         // Если не авторизованы
         if (!$this->isAuth()) {
             // Если поделились контактом
@@ -64,14 +73,110 @@ class InputCommand extends Command
                     $this->mainMenu();
                     break;
 
-                case "user_info":
-                    $this->userInfoMenu();
+                case UserCommand::$btnInfo: {
+                    $class = new UserCommand($bot, $update);
+                    $class->userInfoMenu();
                     break;
+                }
 
-                case "news":
-                    $this->newsMenu();
+                case NewsCommand::$btnMain: {
+                    $class = new NewsCommand($bot, $update);
+                    $class->mainMenu();
                     break;
+                }
 
+                case NewsCommand::$btnNext: {
+                    $class = new NewsCommand($bot, $update);
+                    $class->nextNews();
+                    break;
+                }
+                
+                case NewsCommand::$btnPrev: {
+                    $class = new NewsCommand($bot, $update);
+                    $class->prevNews();
+                    break;
+                }
+
+                case HistoryPaymentsCommand::$btnMain: {
+                    $class = new HistoryPaymentsCommand($bot, $update);
+                    $class->mainMenu();
+                    break;
+                }
+
+                case HistorySessionsCommand::$btnMain: {
+                    $class = new HistorySessionsCommand($bot, $update);
+                    $class->mainMenu();
+                    break;
+                }
+
+                case PaymentsCommand::$btnMain: {
+                    $class = new PaymentsCommand($bot, $update);
+                    $class->mainMenu();
+                    break;
+                }
+
+                case PaymentsCommand::$btnChaneSumma: {
+                    $class = new PaymentsCommand($bot, $update);
+                    $class->changePaymentSummaBtn();
+                    break;
+                }
+                
+                case PaymentsCommand::$btnGenerateURL: {
+                    $class = new PaymentsCommand($bot, $update);
+                    $class->generateURLBtn();
+                    break;
+                }
+
+                case VoucherCommand::$btnMain: {
+                    $class = new VoucherCommand($bot, $update);
+                    $class->enterVoucher();
+                    break;
+                }
+
+                case ServiceCommand::$btnMain: {
+                    $class = new ServiceCommand($bot, $update);
+                    $class->btnServiceMenu();
+                    break;
+                }
+
+                case TarifCommand::$btnInfo: {
+                    $class = new TarifCommand($bot, $update);
+                    $class->btnTarifInfo();
+                    break;
+                }
+
+                case TarifCommand::$btnList: {
+                    $class = new TarifCommand($bot, $update);
+                    $class->btnTarifList();
+                    break;
+                }
+
+                case TarifCommand::$btnNext: {
+                    $class = new TarifCommand($bot, $update);
+                    $class->btnTarifNext();
+                    break;
+                }
+
+                case TarifCommand::$btnPrev: {
+                    $class = new TarifCommand($bot, $update);
+                    $class->btnTarifPrev();
+                    break;
+                }
+                
+                case TarifCommand::$btnSelect: {
+                    $class = new TarifCommand($bot, $update);
+                    $class->btnTarifConfirm();
+                    break;
+                }
+
+                case TarifCommand::$btnChangeNow:
+                case TarifCommand::$btnChangeNMonth:
+                case TarifCommand::$btnChange: {
+                    $class = new TarifCommand($bot, $update);
+                    $class->btnTarifChange();
+                    break;
+                }
+                
                 case "help":
                     $this->helpMenu();
                     break;
@@ -87,11 +192,7 @@ class InputCommand extends Command
                 case "settings":
                     $this->settingsMenu();
                     break;
-
-                case "services":
-                    $this->servicesMenu();
-                    break;
-
+                    
                 case "notifications":
                     $this->notificationsMenu();
                     break;
@@ -106,8 +207,15 @@ class InputCommand extends Command
                     $this->changeLang($command);
                     break;
 
-                default:
-                    $this->parseInputText($text);
+                default: {
+                    // Кнопка платежной системы
+                    if( strpos($command, PaymentsCommand::$btnPaysystem) !== false ) {
+                        $class = new PaymentsCommand($bot, $update);
+                        $class->choosePaysystem($command);
+                    } else {
+                        $this->parseInputText($text);
+                    }
+                }
             }
         }
     }
@@ -136,10 +244,23 @@ class InputCommand extends Command
             }
         } else {
             switch ($lastAction) {
-                case "langMenu":
-
+                case "langMenu": {
                     break;
+                }
+                
+                case "choosePaysystem":
+                case "changePaymentSummaBtn": {
+                    $class = new PaymentsCommand($this->bot, $this->update);
+                    $class->confirmSummaBtn($text);
+                    break;
+                }
 
+                case "enterVoucher": {
+                    $class = new VoucherCommand($this->bot, $this->update);
+                    $class->useVoucher($text);
+                    break;
+                }
+                
                 default:
                     // по умолчанию
                     $this->mainMenu();
@@ -147,6 +268,23 @@ class InputCommand extends Command
         }
     }
 
+    private function mainMenu()
+    {
+        $this->setLastAction(__FUNCTION__);
+
+        $text = trans("main_menu_text");
+
+        $keyboard = [
+            [["text" => trans(UserCommand::$btnInfo)], ["text" => trans(NewsCommand::$btnMain)]],
+            [["text" => trans(ServiceCommand::$btnMain)], ["text" => trans(PaymentsCommand::$btnMain)]],
+            [["text" => trans(HistoryPaymentsCommand::$btnMain)], ["text" => trans(HistorySessionsCommand::$btnMain)]],
+            [["text" => trans("help")], ["text" => trans("contacts")]],
+            [["text" => trans("settings")]]
+        ];
+
+        $this->buttonKeyboard($text, $keyboard);
+    }
+    
     /**
      * Применить введенный пароль
      */
@@ -177,15 +315,7 @@ class InputCommand extends Command
             $text = trans("unknown_error_text");
         }
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
 
     /**
@@ -221,16 +351,7 @@ class InputCommand extends Command
             $text = trans("unknown_error_text");
         }
 
-
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
 
     private function sendContactMenu()
@@ -280,59 +401,9 @@ class InputCommand extends Command
             }
         }
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
-
-    private function userInfoMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $response = $this->ClientAPI->getUser();
-        $user = $response['data'];
-
-        $text = "<b>" . trans("fio") . ":</b> " . $user['fio'] . "\n";
-        $text .= "<b>" . trans("deposit") . ":</b> " . $user['deposit'] . " " . $user['UE'] . "\n";
-        $text .= "<b>" . trans("credit") . ":</b> " . $user['credit'] . " " . $user['UE'] . "\n";
-        $text .= "<b>" . trans("tariff") . ":</b> " . $user['tarif'] . "\n";
-        $text .= "<b>" . trans("login") . ":</b> " . $user['user'] . "\n";
-        $text .= "<b>UID:</b>" . $user['useruid'] . " \n";
-        $text .= "<b>" . trans("dogovor") . ":</b>" . $user['numdogovor'] . " \n";
-        if ($user['blocked']) {
-            $text .= "<b>" . trans("internet") . ":</b> 🚫 \n";
-        } else {
-            $text .= "<b>" . trans("internet") . ":</b> ✅ \n";
-
-            if (!empty($user['date_itog'])) {
-                $text .= "<b>" . trans("date_off") . ":</b> " . $user['date_itog'] . " \n";
-                $text .= "<b>" . trans("days_left") . ":</b> " . $user['days_left'] . " \n";
-            }
-        }
-
-
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
-    }
-
-
+    
     private function aboutMenu()
     {
         $this->setLastAction(__FUNCTION__);
@@ -343,18 +414,9 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
-
-
+    
     private function langMenu()
     {
         $this->setLastAction(__FUNCTION__);
@@ -366,24 +428,13 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
-
+        $this->buttonKeyboard($text, $keyboard);
     }
-
-
+    
     private function changeLang($command)
     {
         $this->setLastAction(__FUNCTION__);
 
-        dump($command);
         switch ($command) {
             case  'lang_uk':
                 $locale = 'uk';
@@ -412,18 +463,8 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
-
+        $this->buttonKeyboard($text, $keyboard);
     }
-
 
     private function settingsMenu()
     {
@@ -439,15 +480,7 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
 
     private function notificationsMenu()
@@ -463,15 +496,7 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
 
     private function contactsMenu()
@@ -487,18 +512,9 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
-
-
+    
     private function helpMenu()
     {
         $this->setLastAction(__FUNCTION__);
@@ -510,37 +526,9 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
-
-    private function newsMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-        $text = trans("Hello");
-        
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
-    }
-
+    
     private function servicesMenu()
     {
         $this->setLastAction(__FUNCTION__);
@@ -555,37 +543,7 @@ class InputCommand extends Command
             [["text" => trans("back")]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
-    }
-
-    private function mainMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $text = trans("main_menu_text");
-
-        $keyboard = [
-            [["text" => trans("user_info")], ["text" => trans("news")]],
-            [["text" => trans("help")], ["text" => trans("contacts")]],
-            [["text" => trans("settings")]]
-        ];
-
-        $this->sendMessage([
-            'text'         => $text,
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
 
     private function noAuthMenu()
@@ -598,15 +556,6 @@ class InputCommand extends Command
             [["text" => trans("send_contact"), "request_contact" => true]],
         ];
 
-        $this->sendMessage([
-            'text'         => $text,
-            'parse_mode'   => 'HTML',
-            'reply_markup' => [
-                'keyboard'          => $keyboard,
-                'resize_keyboard'   => true,
-                'one_time_keyboard' => true
-            ]
-        ]);
+        $this->buttonKeyboard($text, $keyboard);
     }
-
 }

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\Telegram;
+namespace App\Models;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Class ClientAPI
- * @package App\Services\Telegram
+ * @package App\Models
  */
 class ClientAPI
 {
@@ -531,6 +531,31 @@ class ClientAPI
         ];
 
         return $this->sendRequest('/api/v1/cabinet/report/sessions', 'POST', $params);
+    }
+
+    /**
+     * Пополнение счета с помощью ваучера
+     * @param string $series
+     * @param string $number
+     * @return false|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function useVoucher(string $series, string $number) {
+        $params = [
+            'series' => $series,
+            'number' => $number
+        ];
+
+        return $this->sendRequest('/api/v1/cabinet/payments/voucher', 'POST', $params);
+    }
+
+    /**
+     * Настройки кабинета
+     * @return false|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getConfig() {
+        return $this->sendRequest('/api/v1/cabinet/config', 'GET');
     }
     
     /**

@@ -6,7 +6,7 @@ use App;
 use App\Models\TelegramUsers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use App\Services\Telegram\ClientAPI;
+use App\Models\ClientAPI;
 use WeStacks\TeleBot\Handlers\CommandHandler;
 use WeStacks\TeleBot\Objects\Update;
 use WeStacks\TeleBot\TeleBot;
@@ -32,10 +32,15 @@ abstract class Command extends CommandHandler
         parent::__construct($bot, $update);
 
         // Переопределяем язык и проверим что он поддерживается в боте
+        $language_code = 'en';
         if (isset($this->update->message->from->language_code) and !in_array($this->update->message->from->language_code, ['uk', 'ru', 'en'])) {
             $language_code = 'ru';
         } else {
-            $language_code = $this->update->message->from->language_code;
+            if( isset($this->update->message->from->language_code) ) {
+                $language_code = $this->update->message->from->language_code;
+            } elseif (isset($this->update->callback_query->from->language_code)) {
+                $language_code = $this->update->callback_query->from->language_code;
+            }
         }
 
         // Инициализируем ID пользователя
@@ -142,9 +147,24 @@ abstract class Command extends CommandHandler
     /**
      * Достать из кеша
      * @param mixed $value
+     * @param mixed $default
+     * @return mixed
      */
-    public function getValue($key) {
-        Cache::get($this->user_id . '_memory_' . $key);
+    public function getValue($key, $default = 0) {
+        return Cache::get($this->user_id . '_memory_' . $key, $default);
+    }
+
+    /**
+     * Успешный ответ
+     * @param array $response
+     * @return bool
+     */
+    public function validResponse(array $response) {
+        if (isset($response['code']) and $response['code'] == 0) {
+            return true;
+        }
+
+        return false;
     }
     
     /**
@@ -154,12 +174,43 @@ abstract class Command extends CommandHandler
     {
         return $this->isAuth;
     }
-
+    
     /**
      * @return bool
      */
     public function checkAuth()
     {
         return $this->isAuth = TelegramUsers::where('id', '=', $this->getUserID())->whereNotNull('token')->exists();
+    }
+
+    /**
+     * @param $text
+     * @param $keyboard
+     */
+    public function buttonKeyboard($text, $keyboard) {
+        $this->sendMessage([
+            'text'         => $text,
+            'parse_mode'   => 'HTML',
+            'reply_markup' => [
+                'keyboard'          => $keyboard,
+                'resize_keyboard'   => true,
+                'one_time_keyboard' => true
+            ]
+        ]);
+    }
+
+    /**
+     * @param $text
+     * @param $keyboard
+     * @return false|\WeStacks\TeleBot\Interfaces\Message|\WeStacks\TeleBot\Interfaces\PromiseInterface
+     */
+    public function InlineKeyboard($text, $keyboard) {
+        return $this->sendMessage([
+            'text' => $text,
+            'chat_id' => $this->update->chat()->id,
+            'reply_markup'   =>  [
+                'inline_keyboard' => $keyboard
+            ],
+        ]);
     }
 }

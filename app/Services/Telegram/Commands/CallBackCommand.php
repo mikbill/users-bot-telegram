@@ -1,15 +1,18 @@
 <?php
 
-
 namespace App\Services\Telegram\Commands;
 
-
+use App\Helpers\Helper;
 use WeStacks\TeleBot\Objects\Update;
 use WeStacks\TeleBot\TeleBot;
+use Illuminate\Support\Facades\Log;
 
+/**
+ * Class CallBackCommand
+ * @package App\Services\Telegram\Commands
+ */
 class CallBackCommand extends Command
 {
-
     /**
      * Обрабатываем callback_query
      *
@@ -27,25 +30,6 @@ class CallBackCommand extends Command
      */
     public function handle()
     {
-//        $this->answerCallbackQuery([
-//            'callback_query_id' => $this->update->callback_query->id,
-//            'text'              => 'Загружаем...',
-//            "alert"             => false
-//        ]);
 
-
-//        $params = explode("_", $this->update->callback_query->data);
-//
-//        if (isset($params[0]) and method_exists(self::class, $params[0])) {
-//            $method = $params[0];
-//            $this->$method($params); // вызываем метод
-//        } else {
-//
-//            $this->sendMessage([
-//                'text'       => '⚠️ Мы еще работаем над этим меню... ',
-//                'parse_mode' => 'HTML'
-//            ]);
-//        }
     }
-
 }

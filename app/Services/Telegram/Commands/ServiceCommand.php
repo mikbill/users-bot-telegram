@@ -40,11 +40,55 @@ class ServiceCommand extends Command
     public function btnServiceMenu() {
         $this->setLastAction(__FUNCTION__);
 
-        $text = trans($this->msg_service_menu);
-        $keyboard = [
-            [["text" => trans(TarifCommand::$btnInfo)]],
-            [["text" => trans("back")]],
-        ];
+        $response = $this->ClientAPI->getUserServices();
+        //{"success":true,"code":0,"data":{"services":{"credit":1,"turbo":1,"freeze":1,"realip":1,"transfer":1}},"message":"\u041e\u041a"}
+        if( $this->validResponse($response) ) {
+            $buttons = [];
+            $buttons[] = ["text" => trans(TarifCommand::$btnInfo)];
+            
+            $services = $response["data"]["services"];
+            if( $services["credit"] == 1 ) {
+                $buttons[] = ["text" => trans(CreditCommand::$btnCreditInfo)];
+            }
+            
+            if( $services["freeze"] == 1 ) {
+                $buttons[] = ["text" => trans(FreezeCommand::$btnFreezeInfo)];
+            }
+            
+            if( $services["realip"] == 1 ) {
+                $buttons[] = ["text" => trans(RealIPCommand::$btnInfo)];
+            }
+            
+            if( $services["turbo"] == 1 ) {
+                $buttons[] = ["text" => trans(TurboCommand::$btnTurboInfo)];
+            }
+
+            $tmp = [];
+            foreach($buttons as $button) {
+                if(count($tmp) >= 2) {
+                    $keyboard[] = $tmp;
+                    $tmp = [];
+                }
+
+                $tmp[] = $button;
+            }
+
+            if( !empty($tmp) ) {
+                $keyboard[] = $tmp;
+            }
+
+            $text = trans($this->msg_service_menu);
+            if(empty($buttons)) {
+                $text = trans($this->msg_no_items_left);
+            }
+            
+            $keyboard[] = [["text" => trans("back")]];
+        } else {
+            $text = trans($this->msg_error_request);
+            $keyboard = [
+                [["text" => trans("back")]],
+            ];
+        }
         
         $this->buttonKeyboard($text, $keyboard);
     }

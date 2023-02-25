@@ -69,6 +69,7 @@ class VoucherCommand extends Command
             ];
         } else {
             if( isset($response["message"]) ) {
+                $this->setLastAction("InvalidVoucher");
                 $text = trans($response["message"]);
                 $keyboard = [
                     [["text" => trans("back")]],

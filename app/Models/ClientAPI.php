@@ -557,6 +557,15 @@ class ClientAPI
     public function getConfig() {
         return $this->sendRequest('/api/v1/cabinet/config', 'GET');
     }
+
+    /**
+     * Получить доступные услуги на данный момент абоненту
+     * @return false|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUserServices() {
+        return $this->sendRequest('/api/v1/cabinet/user/services', 'GET');
+    }
     
     /**
      * @param $uri
@@ -583,15 +592,18 @@ class ClientAPI
             'headers'     => $headers
         ]);
 
-        Log::debug("url: {$method} {$uri}");
-        Log::debug("form_params:" . json_encode($params));
-        Log::debug("headers:" . json_encode($headers));
+        //Log::debug("url: {$method} {$uri}");
+        //Log::debug("form_params:" . json_encode($params));
+        //Log::debug("headers:" . json_encode($headers));
 
         if ($res->getStatusCode() == 200) { // 200 OK
             $response = json_decode($res->getBody()->getContents(), true);
-            Log::debug("response:" . json_encode($response));
+            //Log::debug("response:" . json_encode($response));
             return $response;
         } else {
+            Log::debug("url: {$method} {$uri}");
+            Log::debug("form_params:" . json_encode($params));
+            Log::debug("headers:" . json_encode($headers));
             Log::debug("response error: status code=" . $res->getStatusCode());
         }
 

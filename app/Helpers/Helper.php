@@ -4,6 +4,8 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
+use Monolog\Logger;
 
 /**
  * Class Helper
@@ -100,4 +102,119 @@ class Helper
 
         return $outputValue;
     }
+
+    /**
+     * @param array $title
+     * @param array $body
+     * @return string
+     */
+    public static function generateMessage($title, $body) {
+        $text = "";
+        foreach($body as $index => $item) {
+            if( is_array($item) ) {
+                $text .= self::generateMessage($title, $item);
+            } else {
+                $text .= "{$title[$index]}: {$item}";
+            }
+
+            $text .= "\n";
+        }
+        
+        return $text;
+    }
+    
+    /**
+     * Format message table
+     * @param array $title
+     * @param array $body
+     * @return string
+     */
+    public static function generateTable($title, $body) {
+        $length = self::getLength($title, $body);
+        
+        $text = "<pre>\n";
+        $text .= self::makeRow($title, $length);
+        $text .= self::makeSeparator($title, $length, "-");
+        foreach($body as $index => $item) {
+            $text .= self::makeRow($item, $length);
+        }
+        $text .= "</pre>";
+
+        return $text;
+    }
+
+    /**
+     * @param $rowArray
+     * @param $length
+     * @param string $fill_symbol
+     * @return string
+     */
+    private static function makeRow($rowArray, $length, $fill_symbol = " ") {
+        $row = "|";
+        
+        foreach($rowArray as $key => $value) {
+            $section_length = (int)$length[$key] - (int)mb_strlen($value);
+            $row .= " " . $value . str_pad("", $section_length, $fill_symbol) . " |";
+        }
+
+        $row .= "\n";
+        
+        return $row;
+    }
+
+    /**
+     * @param $rowArray
+     * @param $length
+     * @param string $fill_symbol
+     * @return string
+     */
+    private static function makeSeparator($rowArray, $length, $fill_symbol = " ") {
+        $row = "|";
+
+        foreach($rowArray as $key => $value) {
+            $row .= " " . str_pad("", (int)$length[$key], $fill_symbol) . " |";
+        }
+
+        $row .= "\n";
+
+        return $row;
+    }
+    
+    /**
+     * 
+     * @param array $title
+     * @param array $body
+     * @return array
+     */
+    private static function getLength($title, $body) {
+        $length = [];
+
+        foreach($title as $k => $v) {
+            $str_length = (int)mb_strlen((string)$v);
+
+            if( !isset($length[$k]) ) {
+                $length[$k] = $str_length;
+            }
+
+            if( $length[$k] < $str_length ) {
+                $length[$k] = $str_length;
+            }
+        }
+        
+        foreach($body as $key => $item) {
+            foreach($item as $k => $v) {
+                $str_length = (int)mb_strlen((string)$v);
+
+                if( !isset($length[$k]) ) {
+                    $length[$k] = $str_length;
+                }
+
+                if( $length[$k] < $str_length ) {
+                    $length[$k] = $str_length;
+                }
+            }
+        }
+
+        return $length;
+    } 
 }

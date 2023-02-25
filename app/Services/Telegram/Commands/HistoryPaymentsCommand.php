@@ -19,9 +19,14 @@ class HistoryPaymentsCommand extends Command
 
     private $msg_error_request = "payhist.msg.request.error";
     private $msg_no_items_left = "payhist.msg.no_items";
+
     private $msg_last10 = "payhist.text.last10";
-    private $msg_summa = "payhist.text.summa";
-    private $msg_comment  = "payhist.text.comment";
+    private $msg_table_title = [
+        "payhist.text.msg.date",
+        "payhist.text.msg.type",
+        "payhist.text.msg.summa",
+        "payhist.text.msg.comment",
+    ];
     
     private $cache_key_start_date = "payhist_start";
     private $cache_key_stop_date = "payhist_stop";
@@ -51,15 +56,15 @@ class HistoryPaymentsCommand extends Command
         $response = $this->ClientAPI->HistoryPayments($this->_last_start_date, $this->_last_end_date);
         if( $this->validResponse($response) ) {
             if(!empty($response["data"])) {
-                $text = trans($this->msg_last10);
+
+                $title = [trans($this->msg_table_title[0]), trans($this->msg_table_title[1]), trans($this->msg_table_title[2]), trans($this->msg_table_title[3])];
+                $body = [];
                 foreach($response["data"] as $item) {
-                    $text .= "[{$item["date"]}] " . trans($item["bugh_type"]) . "; " . trans($this->msg_summa) . " " . $item["summa"] . "\n";
-                    if( !empty($item["comment"]) ) {
-                        $text .= "; " . trans($this->msg_comment) . " " . $item["comment"];
-                    }
-                    $text .= "\n\n";
+                    $body[] = [trim($item["date"]), trans(trim($item["bugh_type"])), trim($item["summa"]), trans(trim($item["comment"]))];
                 }
-                
+
+                $text = trans($this->msg_last10);
+                $text .= Helper::generateMessage($title, $body);
                 $keyboard = [
                     [["text" => trans("back")]],
                 ];

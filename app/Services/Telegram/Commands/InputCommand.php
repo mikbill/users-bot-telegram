@@ -6,14 +6,8 @@ use App;
 use App\Helpers\Helper;
 use App\Models\TelegramUsers;
 use App\Notifications\BotNotification;
-use App\Services\Telegram\Commands\HistoryPaymentsCommand;
-use App\Services\Telegram\Commands\HistorySessionsCommand;
-use App\Services\Telegram\Commands\NewsCommand;
-use App\Services\Telegram\Commands\PaymentsCommand;
-use App\Services\Telegram\Commands\UserCommand;
 use WeStacks\TeleBot\Objects\Update;
 use WeStacks\TeleBot\TeleBot;
-use App\Services\Telegram\Commands\VoucherCommand;
 
 /**
  * Class InputCommand
@@ -177,36 +171,141 @@ class InputCommand extends Command
                     break;
                 }
                 
-                case "help":
-                    $this->helpMenu();
+                case TurboCommand::$btnTurboInfo:{
+                    $class = new TurboCommand($bot, $update);
+                    $class->btnTurboInfo();
                     break;
+                }
 
-                case "contacts":
-                    $this->contactsMenu();
+                case TurboCommand::$btnTurboActivate:{
+                    $class = new TurboCommand($bot, $update);
+                    $class->btnTurboActivate();
                     break;
+                }
 
-                case "about":
-                    $this->aboutMenu();
+                case CreditCommand::$btnCreditInfo:{
+                    $class = new CreditCommand($bot, $update);
+                    $class->btnCreditInfo();
                     break;
+                }
 
-                case "settings":
-                    $this->settingsMenu();
+                case CreditCommand::$btnCreditActivate:{
+                    $class = new CreditCommand($bot, $update);
+                    $class->btnCreditActivate();
                     break;
-                    
-                case "notifications":
-                    $this->notificationsMenu();
-                    break;
+                }
 
-                case "lang":
-                    $this->langMenu();
+                case FreezeCommand::$btnFreezeInfo:{
+                    $class = new FreezeCommand($bot, $update);
+                    $class->btnFreezeInfo();
                     break;
+                }
 
-                case "lang_ru":
-                case "lang_uk":
-                case "lang_en":
-                    $this->changeLang($command);
+                case FreezeCommand::$btnFreezeDateStart:{
+                    $class = new FreezeCommand($bot, $update);
+                    $class->btnFreezeStepDateStart();
                     break;
+                }
 
+                case FreezeCommand::$btnFreeze1M:{
+                    $class = new FreezeCommand($bot, $update);
+                    $class->btnFreezeFixedConfirm(1);
+                    break;
+                }
+
+                case FreezeCommand::$btnFreeze2M:{
+                    $class = new FreezeCommand($bot, $update);
+                    $class->btnFreezeFixedConfirm(2);
+                    break;
+                }
+
+                case FreezeCommand::$btnFreeze3M:{
+                    $class = new FreezeCommand($bot, $update);
+                    $class->btnFreezeFixedConfirm(3);
+                    break;
+                }
+
+                case FreezeCommand::$btnFreezeActivate:{
+                    $class = new FreezeCommand($bot, $update);
+                    $class->btnFreezeActivate();
+                    break;
+                }
+
+                case FreezeCommand::$btnFreezeDeactivate:{
+                    $class = new FreezeCommand($bot, $update);
+                    $class->btnFreezeDeactivate();
+                    break;
+                }
+
+                case RealIPCommand::$btnInfo:{
+                    $class = new RealIPCommand($bot, $update);
+                    $class->btnRealIPInfo();
+                    break;
+                }
+
+                case RealIPCommand::$btnActivate:{
+                    $class = new RealIPCommand($bot, $update);
+                    $class->btnRealIPActivate();
+                    break;
+                }
+
+                case RealIPCommand::$btnDeactivate:{
+                    $class = new RealIPCommand($bot, $update);
+                    $class->btnRealIPDeactivate();
+                    break;
+                }
+
+                case AboutCommand::$btnMain:{
+                    $class = new AboutCommand($bot, $update);
+                    $class->btnAbountInfo();
+                    break;
+                }
+
+                case SettingsCommand::$btnMain:{
+                    $class = new SettingsCommand($bot, $update);
+                    $class->btnSettingsInfo();
+                    break;
+                }
+
+                case SettingsCommand::$btnLangChange:{
+                    $class = new SettingsCommand($bot, $update);
+                    $class->btnLangMenu();
+                    break;
+                }
+
+                case SettingsCommand::$btnLangUA:
+                case SettingsCommand::$btnLangEN:
+                case SettingsCommand::$btnLangRU:{
+                    $class = new SettingsCommand($bot, $update);
+                    $class->btnLangChange($command);
+                    break;
+                }
+
+                case TicketsCommand::$btnList:
+                case TicketsCommand::$btnMain:{
+                    $class = new TicketsCommand($bot, $update);
+                    $class->btnTicketsList();
+                    break;
+                }
+
+                case TicketsCommand::$btnOpen:{
+                    $class = new TicketsCommand($bot, $update);
+                    $class->btnEnterTicketID();
+                    break;
+                }
+
+                case TicketsCommand::$btnCreate:{
+                    $class = new TicketsCommand($bot, $update);
+                    $class->btnEnterTicketCreateMessage();
+                    break;
+                }
+
+                case TicketsCommand::$btnAddMessage:{
+                    $class = new TicketsCommand($bot, $update);
+                    $class->btnEnterTicketAddMessage();
+                    break;
+                }
+                
                 default: {
                     // Кнопка платежной системы
                     if( strpos($command, PaymentsCommand::$btnPaysystem) !== false ) {
@@ -244,10 +343,10 @@ class InputCommand extends Command
             }
         } else {
             switch ($lastAction) {
-                case "langMenu": {
+                case "btnLangMenu":{
                     break;
                 }
-                
+
                 case "choosePaysystem":
                 case "changePaymentSummaBtn": {
                     $class = new PaymentsCommand($this->bot, $this->update);
@@ -258,6 +357,42 @@ class InputCommand extends Command
                 case "enterVoucher": {
                     $class = new VoucherCommand($this->bot, $this->update);
                     $class->useVoucher($text);
+                    break;
+                }
+                
+                case "btnFreezeStepDateStart": {
+                    $class = new FreezeCommand($this->bot, $this->update);
+                    $class->btnFreezeStepDateStop($text);
+                    break;
+                }
+                
+                case "btnFreezeStepDateStop": {
+                    $class = new FreezeCommand($this->bot, $this->update);
+                    $class->btnFreezeStepConfirm($text);
+                    break;
+                }
+                
+                case "btnEnterTicketID": {
+                    $class = new TicketsCommand($this->bot, $this->update);
+                    $class->btnOpenTicket($text);
+                    break;
+                }
+                
+                case "btnEnterTicketCreateMessage": {
+                    $class = new TicketsCommand($this->bot, $this->update);
+                    $class->btnCreateTicket($text);
+                    break;
+                }
+
+                case "btnEnterTicketAddMessage": {
+                    $class = new TicketsCommand($this->bot, $this->update);
+                    $class->btnTicketAddMessage($text);
+                    break;
+                }
+                
+                case "InvalidVoucher": {
+                    $class = new PaymentsCommand($this->bot, $this->update);
+                    $class->mainMenu();
                     break;
                 }
                 
@@ -275,11 +410,9 @@ class InputCommand extends Command
         $text = trans("main_menu_text");
 
         $keyboard = [
-            [["text" => trans(UserCommand::$btnInfo)], ["text" => trans(NewsCommand::$btnMain)]],
-            [["text" => trans(ServiceCommand::$btnMain)], ["text" => trans(PaymentsCommand::$btnMain)]],
-            [["text" => trans(HistoryPaymentsCommand::$btnMain)], ["text" => trans(HistorySessionsCommand::$btnMain)]],
-            [["text" => trans("help")], ["text" => trans("contacts")]],
-            [["text" => trans("settings")]]
+            [["text" => trans(NewsCommand::$btnMain)], ["text" => trans(UserCommand::$btnInfo)], ["text" => trans(ServiceCommand::$btnMain)]],
+            [["text" => trans(PaymentsCommand::$btnMain)], ["text" => trans(HistoryPaymentsCommand::$btnMain)], ["text" => trans(HistorySessionsCommand::$btnMain)]],
+            [["text" => trans(TicketsCommand::$btnMain)], ["text" => trans(AboutCommand::$btnMain)], ["text" => trans(SettingsCommand::$btnMain)]]
         ];
 
         $this->buttonKeyboard($text, $keyboard);
@@ -404,148 +537,6 @@ class InputCommand extends Command
         $this->buttonKeyboard($text, $keyboard);
     }
     
-    private function aboutMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $text = "Здесь в будущем появится информация о вашем провайдере";
-
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-    
-    private function langMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $text = "Выберите язык общения в боте";
-
-        $keyboard = [
-            [["text" => trans("lang_uk")], ["text" => trans("lang_ru")], ["text" => trans("lang_en")]],
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-    
-    private function changeLang($command)
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        switch ($command) {
-            case  'lang_uk':
-                $locale = 'uk';
-                break;
-
-            case  'lang_ru':
-                $locale = 'ru';
-                break;
-            case  'lang_en':
-                $locale = 'en';
-                break;
-
-            default:
-                $locale = 'ru';
-        }
-
-        // Установим язык
-        App::setLocale($locale);
-
-        // Обновим пользователя
-        TelegramUsers::whereId($this->getUserID())->update(['language' => $locale]);
-
-        $text = trans("lang_changed") . " " . trans($command);
-
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-
-    private function settingsMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $text = "Настройки \n\n";
-        $text .= "🔔 <b>Уведомления</b> - управление уведомлениями при пополнении счета, либо других финансовых операций; \n";
-        $text .= "🇺🇸 <b>Выбор языка</b> - выберите язык, на котором бот будет вести диалог; \n";
-
-        $keyboard = [
-            //[["text" => trans("notifications")], ["text" => trans("lang")]],
-            [["text" => trans("lang")]],
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-
-    private function notificationsMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $text = "<b>Текущий статус уведомлений:</b> \n\n";
-        $text .= "🔕 Новости\n\n";
-        $text .= "🔔 Финансовые уведомления \n\n";
-        $text .= "🔔 За 3 дня до отключения \n\n";
-
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-
-    private function contactsMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $text = "Наши контакты: \n";
-        $text .= "Офис: г.Городской ул. Уличная 1. \n";
-        $text .= "т. +38(000) 000-00-00 \n";
-        $text .= "telegram: ";
-
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-    
-    private function helpMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        $tgUsers = $this->getUser();
-        $text = trans("Hello");
-
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-    
-    private function servicesMenu()
-    {
-        $this->setLastAction(__FUNCTION__);
-
-        // Получаем подключенные услуги
-        $response = $this->ClientAPI->getUser();
-        $user = $response['data'];
-
-        $text = trans("Hello");
-
-        $keyboard = [
-            [["text" => trans("back")]],
-        ];
-
-        $this->buttonKeyboard($text, $keyboard);
-    }
-
     private function noAuthMenu()
     {
         $this->setLastAction(__FUNCTION__);

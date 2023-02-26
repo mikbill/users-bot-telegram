@@ -90,7 +90,7 @@ class AboutCommand extends Command
                 $text = trans($this->msg_no_items_left);
 
                 $keyboard = [
-                    ["text" => trans("back")],
+                    [["text" => trans("back")]],
                 ];
             }
         } else {

@@ -14,22 +14,37 @@ class ClientAPI
     private $secret_key = null;
     private $jwt_token = null;
     private $client = null;
-
+    private $debug = false;
+    
     /**
      * ClientAPI constructor.
      * @param string $host
      * @param null $secret_key
      */
-    public function __construct(string $host, $secret_key = null)
+    public function __construct(string $host, $secret_key = null, $debug = false)
     {
         $this->secret_key = $secret_key;
-
+        $this->debug = $debug;
+        
         $this->client = new Client([
             'base_uri' => $host,
             'verify'   => false
         ]);
     }
 
+    /**
+     * @param $message
+     */
+    private function debug($message) {
+        if( $this->debug ) {
+            if(is_array($message)) {
+                $message = json_encode($message, JSON_INVALID_UTF8_IGNORE|JSON_UNESCAPED_UNICODE);
+            }
+
+            Log::debug($message);
+        }
+    }
+    
     /**
      * @param string $token
      */
@@ -592,22 +607,18 @@ class ClientAPI
             'headers'     => $headers
         ]);
 
-        //Log::debug("url: {$method} {$uri}");
-        //Log::debug("form_params:" . json_encode($params));
-        //Log::debug("headers:" . json_encode($headers));
+        $this->debug("url: {$method} {$uri}");
+        $this->debug("form_params:" . json_encode($params));
+        $this->debug("headers:" . json_encode($headers));
 
         if ($res->getStatusCode() == 200) { // 200 OK
             $response = json_decode($res->getBody()->getContents(), true);
-            //Log::debug("response:" . json_encode($response));
+            $this->debug("response:" . json_encode($response));
             return $response;
         } else {
-            Log::debug("url: {$method} {$uri}");
-            Log::debug("form_params:" . json_encode($params));
-            Log::debug("headers:" . json_encode($headers));
-            Log::debug("response error: status code=" . $res->getStatusCode());
+            $this->debug("response error: status code=" . $res->getStatusCode());
         }
 
         return false;
     }
-
 }

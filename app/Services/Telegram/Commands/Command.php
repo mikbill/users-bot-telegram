@@ -74,7 +74,7 @@ abstract class Command extends CommandHandler
         $this->setUser($tgUser);
 
         // Пришел номер пытаемся авторизоваться по ОТП
-        $this->ClientAPI = new ClientAPI(config('services.mb_api.host'), config('services.mb_api.secret_key'));
+        $this->ClientAPI = new ClientAPI(config('services.mb_api.host'), config('services.mb_api.secret_key'), config('app.debug', false));
 
         if (!empty($tgUser->token)) {
             $this->ClientAPI->setJWT($tgUser->token);

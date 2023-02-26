@@ -151,15 +151,12 @@ php artisan migrate
 
 ```
 
-### 3.2 JWT и ключи
+### 3.2 Сгенерируем ключ приложения
 
 
 ```shell script
 
 php artisan key:generate
-
-php artisan jwt:secret
-
 ```
 
 ### 4. Webhook

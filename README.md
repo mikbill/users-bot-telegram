@@ -47,8 +47,8 @@ cd users-bot-telegram
 
 # даем права
 mkdir -p /var/www/users-bot-telegram/storage/{sessions,views,cache}
-sudo chown -R www-data:www-data /var/www/mb-users-bot
-sudo chmod -R 775 /var/www/mb-users-bot/storage/
+sudo chown -R www-data:www-data /var/www/users-bot-telegram
+sudo chmod -R 775 /var/www/users-bot-telegram/storage/
 
 composer install
 ```

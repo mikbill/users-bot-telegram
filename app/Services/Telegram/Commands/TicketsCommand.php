@@ -190,9 +190,17 @@ class TicketsCommand extends Command
                     trans($this->msg_ticket_date), trans($this->msg_ticket_who), trans($this->msg_ticket_message)
                 ];
                 $body = [];
+                
+                $limit = 10; $i = 0;
+                rsort($response["data"]);
                 foreach($response["data"] as $item) {
                     $from = ((int)$item["stuffid"] == 0) ? trans($this->msg_ticket_from_you) : trans($this->msg_ticket_from_support);
                     $body[] = [$item["date"], $from, $item["message"]];
+                    $i++;
+                    
+                    if( $i >= $limit) {
+                        break;
+                    }
                 }
 
                 $text = Helper::generateMessage($title, $body);

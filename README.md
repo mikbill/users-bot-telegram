@@ -47,6 +47,7 @@ cd users-bot-telegram
 
 # даем права
 mkdir -p /var/www/users-bot-telegram/storage/{sessions,views,cache}
+mkdir -p /var/www/users-bot-telegram/storage/framework/{sessions,views,cache}
 sudo chown -R www-data:www-data /var/www/users-bot-telegram
 sudo chmod -R 775 /var/www/users-bot-telegram/storage/
 

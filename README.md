@@ -45,12 +45,13 @@ cd /var/www/
 git clone https://github.com/mikbill/users-bot-telegram.git
 cd users-bot-telegram
 
-composer install
-
 # даем права
 mkdir -p /var/www/users-bot-telegram/storage/{sessions,views,cache}
-sudo chown -R www-data:www-data /var/www/mb-users-bot
-sudo chmod -R 775 /var/www/mb-users-bot/storage/
+mkdir -p /var/www/users-bot-telegram/storage/framework/{sessions,views,cache}
+sudo chown -R www-data:www-data /var/www/users-bot-telegram
+sudo chmod -R 775 /var/www/users-bot-telegram/storage/
+
+composer install
 ```
 
 ### 2. Nginx 
@@ -127,7 +128,7 @@ DirectoryIndex /public/index.php
 
 ```shell script
 
-DB_HOST=127.0.0.1
+DB_HOST=localhost
 DB_PORT=3306
 DB_DATABASE=laravel
 DB_USERNAME=root

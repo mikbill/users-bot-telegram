@@ -90,9 +90,12 @@ class NewsCommand extends Command
             if(!empty($response["data"])) {
                 $this->setNewsArray($response["data"]);
 
-                $news = $this->_news_array[0];
-                $text = strip_tags($news["text"]);
-
+                $text = trans($this->msg_no_items_left);
+                foreach($response["data"] as $item) {
+                    $text = strip_tags($item["text"]);
+                    break;
+                }
+                
                 $keyboard = [
                     [["text" => trans(self::$btnNext)]],
                     [["text" => trans("back")]],
@@ -101,7 +104,7 @@ class NewsCommand extends Command
                 $text = trans($this->msg_no_items_left);
 
                 $keyboard = [
-                    ["text" => trans("back")],
+                    [["text" => trans("back")]],
                 ];
             }
         } else {

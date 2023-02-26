@@ -160,6 +160,7 @@ php artisan key:generate
 ```
 
 ### 4. Webhook
+Перед запуском нужно указать в .env ссылку на хук для бота в переменной APP_URL
 
 Установить webhook
 ```php

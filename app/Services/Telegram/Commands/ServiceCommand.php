@@ -41,25 +41,28 @@ class ServiceCommand extends Command
         $this->setLastAction(__FUNCTION__);
 
         $response = $this->ClientAPI->getUserServices();
-        //{"success":true,"code":0,"data":{"services":{"credit":1,"turbo":1,"freeze":1,"realip":1,"transfer":1}},"message":"\u041e\u041a"}
+        //{"success":true,"code":0,"data":{"services":{"credit":1,"turbo":1,"freeze":1,"realip":1,"transfer":1,"tarif":1}},"message":"\u041e\u041a"}
         if( $this->validResponse($response) ) {
             $buttons = [];
-            $buttons[] = ["text" => trans(TarifCommand::$btnInfo)];
             
             $services = $response["data"]["services"];
-            if( $services["credit"] == 1 ) {
+            if( isset($services["tarif"]) && $services["tarif"] == 1 ) {
+                $buttons[] = ["text" => trans(TarifCommand::$btnInfo)];
+            }
+            
+            if( isset($services["credit"]) && $services["credit"] == 1 ) {
                 $buttons[] = ["text" => trans(CreditCommand::$btnCreditInfo)];
             }
             
-            if( $services["freeze"] == 1 ) {
+            if( isset($services["freeze"]) && $services["freeze"] == 1 ) {
                 $buttons[] = ["text" => trans(FreezeCommand::$btnFreezeInfo)];
             }
             
-            if( $services["realip"] == 1 ) {
+            if( isset($services["realip"]) && $services["realip"] == 1 ) {
                 $buttons[] = ["text" => trans(RealIPCommand::$btnInfo)];
             }
             
-            if( $services["turbo"] == 1 ) {
+            if( isset($services["turbo"]) && $services["turbo"] == 1 ) {
                 $buttons[] = ["text" => trans(TurboCommand::$btnTurboInfo)];
             }
 

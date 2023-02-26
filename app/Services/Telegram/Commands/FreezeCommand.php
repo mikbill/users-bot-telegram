@@ -33,6 +33,7 @@ class FreezeCommand extends Command
     private $msg_unfreeze_disabled = "freeze.msg.unfreeze_disabled";
     
     private $msg_enter_date_start = "freeze.msg.enter_date_start";
+    private $msg_date_start_error = "freeze.msg.enter_date_start_error";
     private $msg_enter_date_stop = "freeze.msg.enter_date_stop";
     private $msg_select_date_stop = "freeze.msg.select_date_stop";
     private $msg_min_days_conflict = "freeze.msg.min_days_conflict";
@@ -212,26 +213,37 @@ class FreezeCommand extends Command
     public function btnFreezeStepDateStop($days_to_start) {
         $this->setLastAction(__FUNCTION__);
 
-        $this->setCache($this->cache_key_start_date, date("Y-m-d", strtotime("+{$days_to_start} DAYS")));
-        
-        $text = trans($this->msg_activation_date) . ": " . $this->getCache($this->cache_key_start_date) . "\n";
-        $text .= trans($this->msg_deactivation_date) . ": " . $this->getCache($this->cache_key_stop_date) . "\n\n";
-        
-        if( $this->getCache($this->cache_key_fixed, 0) == 0 ) {
-            // default
-            $text .= trans($this->msg_enter_date_stop);
-            $keyboard = [
-                [["text" => trans("back")]],
-            ];
+        if( $days_to_start >= 0 ) {
+            $this->setCache($this->cache_key_start_date, date("Y-m-d", strtotime("+{$days_to_start} DAYS")));
+
+            $text = trans($this->msg_activation_date) . ": " . $this->getCache($this->cache_key_start_date) . "\n";
+            $text .= trans($this->msg_deactivation_date) . ": " . $this->getCache($this->cache_key_stop_date) . "\n\n";
+
+            if( $this->getCache($this->cache_key_fixed, 0) == 0 ) {
+                // default
+                $text .= trans($this->msg_enter_date_stop);
+                $keyboard = [
+                    [["text" => trans("back")]],
+                ];
+            } else {
+                // fixed
+                $text .= trans($this->msg_select_date_stop);
+                $keyboard = [
+                    [["text" => trans(self::$btnFreeze1M)], ["text" => trans(self::$btnFreeze2M)], ["text" => trans(self::$btnFreeze3M)]],
+                    [["text" => trans("back")]],
+                ];
+            }
         } else {
-            // fixed
-            $text .= trans($this->msg_select_date_stop);
+            $this->setLastAction("btnFreezeStepDateStart");
+            
+            $text = trans($this->msg_date_start_error) . "\n";
+            $text .= trans($this->msg_enter_date_start);
+            
             $keyboard = [
-                [["text" => trans(self::$btnFreeze1M)], ["text" => trans(self::$btnFreeze2M)], ["text" => trans(self::$btnFreeze3M)]],
                 [["text" => trans("back")]],
             ];
         }
-
+        
         $this->buttonKeyboard($text, $keyboard);
     }
 

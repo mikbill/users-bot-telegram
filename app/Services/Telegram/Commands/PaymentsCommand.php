@@ -122,7 +122,7 @@ class PaymentsCommand extends Command
                     $tmp = [];
                     foreach($this->paysystems as $paysystem) {
                         if(isset($response["data"][$paysystem]) && (int)$response["data"][$paysystem] == 1) {
-                            if(count($tmp) >= 2) {
+                            if(count($tmp) >= 3) {
                                 $keyboard[] = $tmp;
                                 $tmp = [];
                             }

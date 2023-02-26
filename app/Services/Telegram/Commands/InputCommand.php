@@ -312,7 +312,12 @@ class InputCommand extends Command
                         $class = new PaymentsCommand($bot, $update);
                         $class->choosePaysystem($command);
                     } else {
-                        $this->parseInputText($text);
+                        if( $command == "back" ) {
+                            // по умолчанию
+                            $this->mainMenu();
+                        } else {
+                            $this->parseInputText($text);
+                        }
                     }
                 }
             }
@@ -343,11 +348,12 @@ class InputCommand extends Command
             }
         } else {
             switch ($lastAction) {
-                case "btnLangMenu":{
+                case "choosePaysystem": {
+                    $class = new PaymentsCommand($this->bot, $this->update);
+                    $class->mainMenu();
                     break;
                 }
-
-                case "choosePaysystem":
+                
                 case "changePaymentSummaBtn": {
                     $class = new PaymentsCommand($this->bot, $this->update);
                     $class->confirmSummaBtn($text);

@@ -102,6 +102,7 @@ class TicketsCommand extends Command
                     } else {
                         $text = trans($this->msg_no_items_left);
                         $keyboard = [
+                            [["text" => trans(self::$btnCreate)]],
                             [["text" => trans("back")]],
                         ];
                     }

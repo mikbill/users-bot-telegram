@@ -36,9 +36,8 @@ class TicketsCommand extends Command
     private $msg_number = "tickets.text.list.number";
     private $msg_date = "tickets.text.list.date";
     private $msg_status = "tickets.text.list.status";
-    private $msg_status_open = "tickets.text.list.status_open";
-    private $msg_status_closed = "tickets.text.list.status_closed";
-    
+    private $msg_status_ticket = "tickets.text.list.status_";
+
     private $msg_ticket_date = "tickets.text.message.date";
     private $msg_ticket_who = "tickets.text.message.who";
     private $msg_ticket_message = "tickets.text.message.text";
@@ -85,8 +84,7 @@ class TicketsCommand extends Command
                         $limit = 10; $i = 0;
                         rsort($tickets_data["data"]);
                         foreach($tickets_data["data"] as $index => $item) {
-                            $status = ($item["statustypename"] == "opened") ? trans($this->msg_status_open) : trans($this->msg_status_closed);
-                            $body[] = [$item["ticketid"], $item["creationdate"], $status];
+                            $body[] = [$item["ticketid"], $item["creationdate"], trans($this->msg_status_ticket . $item["statustypename"])];
                             $i++;
 
                             if( $i >= $limit) {

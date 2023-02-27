@@ -81,9 +81,17 @@ class TicketsCommand extends Command
                         $text = trans($this->msg_list) . ":\n\n";
                         $title = [trans($this->msg_number), trans($this->msg_date), trans($this->msg_status)];
                         $body = [];
+
+                        $limit = 10; $i = 0;
+                        rsort($tickets_data["data"]);
                         foreach($tickets_data["data"] as $index => $item) {
                             $status = ($item["statustypename"] == "opened") ? trans($this->msg_status_open) : trans($this->msg_status_closed);
                             $body[] = [$item["ticketid"], $item["creationdate"], $status];
+                            $i++;
+
+                            if( $i >= $limit) {
+                                break;
+                            }
                         }
                         
                         $text .= Helper::generateMessage($title, $body);

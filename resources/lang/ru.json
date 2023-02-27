@@ -221,7 +221,7 @@
 	"tickets.text.list.status_opened": "открыт",
 	"tickets.text.list.status_closed": "закрыт",
 	"tickets.text.list.status_in_work": "в работе",
-	"tickets.text.list.status_performed": "запланирован",
+	"tickets.text.list.status_performed": "выполнен",
 	"tickets.msg.enter_ticketid": "Для просмотра обращения введите его номер",
 	"tickets.text.message.date": "Дата сообщения",
 	"tickets.text.message.who": "От кого",

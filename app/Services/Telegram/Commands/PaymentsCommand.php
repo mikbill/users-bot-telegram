@@ -96,13 +96,13 @@ class PaymentsCommand extends Command
         if( $this->validResponse($response) ) {
             if(!empty($response["data"])) {
                 if( $response["data"]["otkluchentable"] == 1 ) {
-                    $text = trans($this->msg_error_user_deleted);
+                    $text = trans($this->msg_error_user_disabled);
 
                     $keyboard = [
                         [["text" => trans("back")]],
                     ];
                 } elseif ( $response["data"]["deletedtable"] == 1 ) {
-                    $text = trans($this->msg_error_user_disabled);
+                    $text = trans($this->msg_error_user_deleted);
 
                     $keyboard = [
                         [["text" => trans("back")]],

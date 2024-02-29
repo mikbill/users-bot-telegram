@@ -17,6 +17,8 @@ class SettingsCommand extends Command
 {
     public static $btnMain = "settings.btn.Main";
     public static $btnLangChange = "settings.btn.Lang";
+    public static $btnExit = "settings.btn.Exit";
+    public static $btnExitConfirm = "settings.btn.Exit.Confirm";
     
     public static $btnLangUA = "settings.btn.Lang.UA";
     public static $btnLangEN = "settings.btn.Lang.EN";
@@ -25,6 +27,8 @@ class SettingsCommand extends Command
     private $msg_settings = "settings.text.msg";
     private $msg_select_lang = "settings.text.lang.select";
     private $msg_lang_cahnged = "settings.text.lang.changed";
+    private $msg_exit = "settings.text.exit";
+    private $msg_exit_msg = "settings.text.exit.msg";
     
     public function __construct(TeleBot $bot, Update $update)
     {
@@ -46,6 +50,7 @@ class SettingsCommand extends Command
 
         $keyboard = [
             [["text" => trans(self::$btnLangChange)]],
+            [["text" => trans(self::$btnExit)]],
             [["text" => trans("back")]],
         ];
 
@@ -98,6 +103,34 @@ class SettingsCommand extends Command
 
         $text = trans($this->msg_lang_cahnged) . " " . trans($command);
 
+        $keyboard = [
+            [["text" => trans("back")]],
+        ];
+
+        $this->buttonKeyboard($text, $keyboard);
+    }
+    
+    public function btnExitInfo() {
+        $this->setLastAction(__FUNCTION__);
+
+        $text = trans($this->msg_exit);
+        
+        $keyboard = [
+            [["text" => trans(self::$btnExitConfirm)]],
+            [["text" => trans("back")]],
+        ];
+
+        $this->buttonKeyboard($text, $keyboard);
+    }
+    
+    public function btnExitConfirm() {
+        $this->setLastAction(__FUNCTION__);
+        
+        $this->getUser()->forceDelete();
+        $this->unAuth();
+        
+        $text = trans($this->msg_exit_msg);
+        
         $keyboard = [
             [["text" => trans("back")]],
         ];

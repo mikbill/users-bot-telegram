@@ -174,6 +174,13 @@ abstract class Command extends CommandHandler
     {
         return $this->isAuth;
     }
+
+    /**
+     * 
+     */
+    public function unAuth() {
+        $this->isAuth = false;
+    }
     
     /**
      * @return bool

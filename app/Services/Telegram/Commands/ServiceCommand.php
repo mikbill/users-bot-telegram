@@ -66,6 +66,10 @@ class ServiceCommand extends Command
                 $buttons[] = ["text" => trans(TurboCommand::$btnTurboInfo)];
             }
 
+            if( isset($services["changemac"]) && $services["changemac"] == 1 ) {
+                $buttons[] = ["text" => trans(ChangemacCommand::$btnChangeMACInfo)];
+            }
+            
             $tmp = [];
             foreach($buttons as $button) {
                 if(count($tmp) >= 2) {

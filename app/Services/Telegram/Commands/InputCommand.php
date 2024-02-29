@@ -6,6 +6,8 @@ use App;
 use App\Helpers\Helper;
 use App\Models\TelegramUsers;
 use App\Notifications\BotNotification;
+use Illuminate\Log\Logger;
+use Illuminate\Support\Facades\Log;
 use WeStacks\TeleBot\Objects\Update;
 use WeStacks\TeleBot\TeleBot;
 
@@ -41,6 +43,9 @@ class InputCommand extends Command
         
         dump(__CLASS__ . "->text:" . $text);
         dump(__CLASS__ . "->command:" . $command);
+        
+        //Log::debug(__CLASS__ . "->text:" . $text);
+        //Log::debug(__CLASS__ . "->command:" . $command);
         
         // Если не авторизованы
         if (!$this->isAuth()) {
@@ -183,6 +188,12 @@ class InputCommand extends Command
                     break;
                 }
 
+                case ChangemacCommand::$btnChangeMACInfo:{
+                    $class = new ChangemacCommand($bot, $update);
+                    $class->btnChangeMACInfo();
+                    break;
+                }
+                
                 case CreditCommand::$btnCreditInfo:{
                     $class = new CreditCommand($bot, $update);
                     $class->btnCreditInfo();
@@ -273,6 +284,18 @@ class InputCommand extends Command
                     break;
                 }
 
+                case SettingsCommand::$btnExit:{
+                    $class = new SettingsCommand($bot, $update);
+                    $class->btnExitInfo();
+                    break;
+                }
+
+                case SettingsCommand::$btnExitConfirm:{
+                    $class = new SettingsCommand($bot, $update);
+                    $class->btnExitConfirm();
+                    break;
+                }
+                
                 case SettingsCommand::$btnLangUA:
                 case SettingsCommand::$btnLangEN:
                 case SettingsCommand::$btnLangRU:{
@@ -365,6 +388,12 @@ class InputCommand extends Command
                     $class->useVoucher($text);
                     break;
                 }
+
+                case "btnChangeMACInfo": {
+                    $class = new ChangemacCommand($this->bot, $this->update);
+                    $class->btnChangeMACActivate($text);
+                    break;
+                }
                 
                 case "btnFreezeStepDateStart": {
                     $class = new FreezeCommand($this->bot, $this->update);
@@ -399,6 +428,11 @@ class InputCommand extends Command
                 case "InvalidVoucher": {
                     $class = new PaymentsCommand($this->bot, $this->update);
                     $class->mainMenu();
+                    break;
+                }
+                
+                case "btnExitConfirm": {
+                    $this->noAuthMenu();
                     break;
                 }
                 

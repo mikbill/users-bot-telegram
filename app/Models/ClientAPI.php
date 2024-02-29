@@ -337,6 +337,21 @@ class ClientAPI
 
     /**
      * Изменить данные абонента пользователя
+     * МАС адрес
+     * @param string $value
+     * @return false|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function UserLocalMac(string $value) {
+        $params = [
+            'local_mac' => $value,
+        ];
+
+        return $this->sendRequest('/api/v1/cabinet/user', 'POST', $params);
+    }
+    
+    /**
+     * Изменить данные абонента пользователя
      * Email
      * @param string $value
      * @return false|mixed

@@ -189,6 +189,12 @@
 	"turbo.text.duration": "Время действия услуги",
 	"turbo.text.duration_label": "ч.",
 	
+	"changemac.btn.Info": "\uD83D\uDCBB Изменить МАС адрес",
+	"changemac.msg.request.error": "Ошибка смены МАС адреса",
+	"changemac.msg.request.success": "МАС адрес изменен",
+	"changemac.msg.enter_new_mac": "Введите новый МАС адрес",
+	"changemac.msg.service_not_available": "Смена МАС адреса не доступна",
+	
 	"about.btn.Main": "☎ Контакты",
 	"about.msg.request.error": "Ошибка запроса",
 	"about.msg.no_items": "Нету информации о компании",
@@ -202,10 +208,14 @@
 	"settings.btn.Lang.UA": "\uD83C\uDDFA\uD83C\uDDE6 UA",
 	"settings.btn.Lang.EN": "\uD83C\uDDFA\uD83C\uDDF8 EN",
 	"settings.btn.Lang.RU": "\uD83C\uDDF7\uD83C\uDDFA RU",
+	"settings.btn.Exit": "⛔ Выйти из бота",
+	"settings.btn.Exit.Confirm": "Да, выйти из бота",
 	"settings.text.msg": "Доступные настройки",
 	"settings.text.lang.select": "Выберите язык общения в боте",
 	"settings.text.lang.changed": "Язык успешно изменен на ",
-
+	"settings.text.exit": "Данное действие удалит всю информацию о Вас с бота, продолжить ?",
+	"settings.text.exit.msg": "Информация удалена",
+	
 	"tickets.btn.Main": "\uD83C\uDD98 Помощь",
 	"tickets.btn.List": "Список обращений",
 	"tickets.btn.Create": "Создать обращение",

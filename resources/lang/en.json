@@ -189,6 +189,12 @@
 	"turbo.text.duration": "Service duration",
 	"turbo.text.duration_label": "h",
 
+	"changemac.btn.Info": "\uD83D\uDCBB Change MAC address",
+	"changemac.msg.request.error": "Error changing MAC address",
+	"changemac.msg.request.success": "MAC address changed",
+	"changemac.msg.enter_new_mac": "Enter new MAC address",
+	"changemac.msg.service_not_available": "Changing the MAC address is not available",
+	
 	"about.btn.Main": "☎ Contacts",
 	"about.msg.request.error": "Request failed",
 	"about.msg.no_items": "No company info",
@@ -202,10 +208,14 @@
 	"settings.btn.Lang.UA": "\uD83C\uDDFA\uD83C\uDDE6UA",
 	"settings.btn.Lang.EN": "\uD83C\uDDFA\uD83C\uDDF8EN",
 	"settings.btn.Lang.RU": "\uD83C\uDDF7\uD83C\uDDFA RU",
+	"settings.btn.Exit": "⛔ Leave the bot",
+	"settings.btn.Exit.Confirm": "Yes, log out of the bot",
 	"settings.text.msg": "Settings available",
 	"settings.text.lang.select": "Select the language of communication in the bot",
 	"settings.text.lang.changed": "Language changed successfully to ",
-
+	"settings.text.exit": "This action will delete all information about you from the bot, continue?",
+	"settings.text.exit.msg": "Information deleted",
+	
 	"tickets.btn.Main": "\uD83C\uDD98 Help",
 	"tickets.btn.List": "Tickets List",
 	"tickets.btn.Create": "Create Ticket",

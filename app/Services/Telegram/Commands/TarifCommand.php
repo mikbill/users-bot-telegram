@@ -275,7 +275,7 @@ class TarifCommand extends Command
         $response = $this->ClientAPI->getConfig();
         if( $this->validResponse($response) ) {
             $config = $response["data"]["gui"];
-            if( $config["changetariffoptions_visible"] == 1 ) {
+            if( !empty($config["changetariffoptions_visible"]) ) {
                 // есть выбор
                 $keyboard = [
                     [["text" => trans(self::$btnChangeNow)], ["text" => trans(self::$btnChangeNMonth)]],

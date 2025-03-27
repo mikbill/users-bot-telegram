@@ -51,7 +51,7 @@ class AboutCommand extends Command
         $response = $this->ClientAPI->getConfig();
         if( $this->validResponse($response) ) {
             if(!empty($response["data"])) {
-                if($response["data"]["gui"]["contact_menu_show"] == 1) {
+                if( !empty($response["data"]["gui"]["contact_menu_show"]) ) {
                     //"company_info":{
                     //  "company_name":"ISP DEMO2",
                     //  "company_adress":"",

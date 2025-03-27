@@ -65,7 +65,7 @@ class TicketsCommand extends Command
         $response = $this->ClientAPI->getConfig();
         if( $this->validResponse($response) ) {
             $config = $response["data"]["gui"];
-            if( $config["menu_show_tickets"] == 1 ) {
+            if( isset($config["menu_show_tickets"]) && $config["menu_show_tickets"] == 1 ) {
                 $tickets_data = $this->ClientAPI->TicketsList();
                 if( $this->validResponse($tickets_data) ) {
                     if( !empty($tickets_data["data"]) ) {
